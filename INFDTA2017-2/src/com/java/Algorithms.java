@@ -37,7 +37,6 @@ public class Algorithms {
         }
         return initialPopulation;
     }
-
     /*Initial Populations with chronosomes set*/
     public List<Individual> populateToMakeChronosome(List<Individual> currPopulation) {
         List<Individual> allChronosomes = new ArrayList<>();
@@ -48,7 +47,6 @@ public class Algorithms {
         });
         return allChronosomes;
     }
-
     /*Evaluate the fitness of each Individual and returns list of indivuals and their fitnesses*/
     public List<Individual> getAllFitnesses(List<Individual> initialPopulation) {
         /*Evaluating the fitnesses of all chronosomes and setting them accordingly*/
@@ -61,46 +59,36 @@ public class Algorithms {
         }
         return individualsWithFitness;
     }
-
+    // Selects 2 parents based on Russian Roulette SelectionModel
     public List<Individual> selectTwoParents(List<Individual> listOffIndividuals) {
         List<Individual> TwoParents = new ArrayList<>();
-        int totalFitness = 0;
+        double totalFitness = 0.0;
         Random r = new Random();
-           for(Individual individual: listOffIndividuals) {
-            totalFitness += individual.getFitness();
-        }
-        for(Individual individual: listOffIndividuals) {
-            double chance = individual.getFitness() / totalFitness;
-            System.out.println(individual.getFitness() / totalFitness);
-            individual.setChangeToBePicked(chance);
-        }
-        // Who wins the roulette wins the game as being the parent of the child;
-        r.setSeed(totalFitness);
-        double extractionValue = r.nextDouble();
-        double spinRouletteWheel = 0.0;
-        for(Individual individual: listOffIndividuals) {
-           spinRouletteWheel += individual.getChangeToBePicked();
-           if(checkInRange(spinRouletteWheel, extractionValue)) {
-               TwoParents.add(individual);
-           }
+
+        while (TwoParents.size() != 2) {
+            for (Individual individual : listOffIndividuals) {
+                totalFitness += individual.getFitness();
+            }
+            for (Individual individual : listOffIndividuals) {
+                double chance = round(individual.getFitness() / totalFitness, 2);
+                individual.setChangeToBePicked(chance);
+            }
+            int i=0;
+            // Who wins the roulette wins the game as being the parent of the child;
+            double extractionValue = getExtractionValue();
+            double spinRouletteWheel = 0.0;
+            for (Individual individual : listOffIndividuals) {
+                spinRouletteWheel += individual.getChangeToBePicked();
+                i++;
+                if (checkInRange(spinRouletteWheel, extractionValue)) {
+                    if (TwoParents.size() <= 1) {
+                        TwoParents.add(individual);
+                    }
+                    break;
+                }
+            }
         }
         return TwoParents;
-    }
-
-    public boolean checkInRange(double spinRouletteWheel, double extractionValue) {
-
-        Math.round(extractionValue);
-        if(spinRouletteWheel < extractionValue) {
-            System.out.println("roulette wheel is out of range of extraction value");
-            System.out.println(spinRouletteWheel);
-            System.out.println(extractionValue);
-            return false;
-
-        }
-        if(spinRouletteWheel >= extractionValue) {
-            return true;
-        }
-        return false;
     }
 
     public List<Individual> populateToMakeChronosomeWithElitism(List<Individual> currPopulationElitism) {
@@ -233,6 +221,36 @@ public class Algorithms {
     }
 
 
+    /*Util methods for different kind of calculations*/
+    private static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        long factor = (long) Math.pow(10, places);
+        value = value * factor;
+        long tmp = Math.round(value);
+        return (double) tmp / factor;
+    }
+    private double getExtractionValue() {
+        Random r = new Random();
+        double extractionValue = round(1 * r.nextDouble() , 1);
+        while (!(extractionValue > 0.10 & extractionValue < 0.90)) {
+         extractionValue = round(1 * r.nextDouble(),1);
+        }
+        return extractionValue;
+    }
+    private boolean checkInRange(double spinRouletteWheel, double extractionValue) {
+        if(spinRouletteWheel < extractionValue) {
+            return false;
+        }
+        double inRange = extractionValue/100 * 20; // 5 precent difference
+        if(spinRouletteWheel> extractionValue && spinRouletteWheel <= extractionValue+inRange) {
+            return true;
+        }
+        if(spinRouletteWheel > extractionValue + inRange) {
+            return false;
+        }
+        return false;
+    }
 
 
 /*

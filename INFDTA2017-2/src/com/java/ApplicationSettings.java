@@ -6,16 +6,17 @@ import java.util.List;
 public class ApplicationSettings {
         public static void main(String[] args) {
 
-            Algorithms algorithms = new Algorithms(0.34, 0.91, true, 10, 40);
+            Algorithms algorithms = new Algorithms(0.34, 0.91, true, 1, 10);
             int startingPoint = -1;
-            for (int i = 0; i <= algorithms.numOfIterations; i++) {
+            for (int i = 0; i < algorithms.numOfIterations; i++) {
                 if (algorithms.useElitism) {
 
                     System.out.println("<----------------------Iteration Count:[" + i +"]------------------>");
 
                     System.out.println("<----------------------Creating First Population----------------->");
                     System.out.println("<----------------------Population Size:[" + algorithms.popSize + "]------------------>");
-                    algorithms.selectTwoParents(algorithms.getAllFitnesses(
+                    algorithms.selectTwoParents(
+                            algorithms.getAllFitnesses(
                             algorithms.populateToMakeChronosome(
                             algorithms.createFirstPopulationSetting())));
                     System.out.println("<----------------------Average of Population------------------->");
