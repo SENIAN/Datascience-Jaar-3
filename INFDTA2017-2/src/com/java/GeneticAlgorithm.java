@@ -123,6 +123,8 @@ public class GeneticAlgorithm {
                 lastPopulation.add(childTwo);
             } else {
                 /*Crossover not performed */
+                lastPopulation.add(parentOne);
+                lastPopulation.add(parentTwo);
                 return twoParents;
             }
         } else {
