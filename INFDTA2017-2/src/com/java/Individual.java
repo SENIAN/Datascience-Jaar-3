@@ -12,7 +12,14 @@ public class Individual {
     private double fitness;
     private String chronosome;
     private double changeToBePicked;
+    private int IndividualID;
 
+    public void setIndividualID(int individualID) {
+        IndividualID = individualID;
+    }
+    public int getIndividualID() {
+        return IndividualID;
+    }
     public Individual() {
 
     }

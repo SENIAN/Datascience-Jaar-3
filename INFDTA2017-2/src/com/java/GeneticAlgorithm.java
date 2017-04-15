@@ -16,6 +16,7 @@ public class GeneticAlgorithm {
     private boolean useElitism;
     private int numOfIterations;
     private int popSize;
+    private int childId = 0;
     private int averageFitnessOfInitialPopulation;
     private int fitnessOfNewPopulation;
     private List<Individual> initialPopulation = new ArrayList<>();
@@ -34,6 +35,7 @@ public class GeneticAlgorithm {
             int s = r.nextInt(maximumIntegerValue);
             individual = new Individual();
             individual.setBirthEgg(s);
+            individual.setIndividualID(i);
             initialPopulation.add(individual);
         }
         return initialPopulation;
@@ -90,7 +92,7 @@ public class GeneticAlgorithm {
     }
 
     //Crossover rate from parents to individual
-    public List<Individual> runOnePointCrossover() {
+    public void runOnePointCrossover() {
         Individual parentOne;
         Individual parentTwo;
         Individual childOne = new Individual();
@@ -113,24 +115,27 @@ public class GeneticAlgorithm {
                 String child2 = MatchDna2.substring(0, aRandomValue) + MatchDna1.substring(aRandomValue, MatchDna1.length());
 
                 childOne.setChronosome(child1);
-                childTwo.setChronosome(child1);
                 childOne.setFitness(computeFitness(child1));
-                childTwo.setFitness(computeFitness(child2));
                 childOne.setBirthEgg(Integer.parseInt(child1, 2));
+                childOne.setIndividualID(childId++);
+
+                childTwo.setChronosome(child2);
+                childTwo.setFitness(computeFitness(child2));
                 childTwo.setBirthEgg(Integer.parseInt(child2, 2));
+                childTwo.setIndividualID(childId++);
 
                 lastPopulation.add(childOne);
                 lastPopulation.add(childTwo);
             } else {
                 /*Crossover not performed */
+                parentOne.setIndividualID(childId++);
+                parentTwo.setIndividualID(childId++);
                 lastPopulation.add(parentOne);
                 lastPopulation.add(parentTwo);
-                return twoParents;
             }
         } else {
             System.out.println("Please provide algorithm with 2 parents to do the crossover");
         }
-        return null;
     }
 
     //Use elitism yes or no
@@ -238,16 +243,6 @@ public class GeneticAlgorithm {
 
     }*/
 
-
-  /*  public double getAverageFitness(List<Individual> population) {
-        double returnResult = 0;
-        for (Individual value : population) {
-            returnResult = (float) computeFitness;
-        }
-        returnResult = returnResult / population.size();
-        System.out.println(returnResult);
-        return returnResult;
-    }*/
 
     public double getCrossoverRate() {
         return crossoverRate;
