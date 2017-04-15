@@ -16,6 +16,8 @@ public class GeneticAlgorithm {
     private boolean useElitism;
     private int numOfIterations;
     private int popSize;
+    private int averageFitnessOfInitialPopulation;
+    private int fitnessOfNewPopulation;
     private List<Individual> initialPopulation = new ArrayList<>();
     private List<Individual> listWithChronosomes = new ArrayList<>();
     private List<Individual> individualsWithFitness = new ArrayList<>();
@@ -24,7 +26,7 @@ public class GeneticAlgorithm {
 
 
     /*Initial Population creation  + initialization of chronosomes */
-    private List<Individual> createFirstPopulationSetting() {
+    public List<Individual> createFirstPopulationSetting() {
         int maximumIntegerValue = 31;
         Random r = new Random();
         Individual individual;
@@ -36,7 +38,6 @@ public class GeneticAlgorithm {
         }
         return initialPopulation;
     }
-
     /*Chronosomes set*/
     public List<Individual> populateToMakeChronosome() {
         initialPopulation.forEach(n -> {
@@ -46,7 +47,6 @@ public class GeneticAlgorithm {
         });
         return listWithChronosomes;
     }
-
     /*Evaluate the fitness of each Individual and returns list of indivuals and their fitnesses*/
     public List<Individual> getAllFitnesses() {
         /*Evaluating the fitnesses of all chronosomes and setting them accordingly*/
@@ -83,7 +83,6 @@ public class GeneticAlgorithm {
                     if (twoParents.size() <= 1) {
                         twoParents.add(individual);
                     }
-                    break;
                 }
             }
         }
@@ -91,8 +90,7 @@ public class GeneticAlgorithm {
     }
 
     //Crossover rate from parents to individual
-    public List<Individual> runOnePointCrossover(List<Individual> twoParents) {
-        SecureRandom r = new SecureRandom();
+    public List<Individual> runOnePointCrossover() {
         Individual parentOne;
         Individual parentTwo;
         Individual childOne = new Individual();
@@ -101,22 +99,26 @@ public class GeneticAlgorithm {
         if (twoParents.size() == 2) {
             parentOne = twoParents.get(0);
             parentTwo = twoParents.get(1);
-            double crossoverProb = r.nextDouble() * 1;
-            if (crossoverProb < crossoverRate) {
-                System.out.println("<---------------------------Spliting DNA------------------------->");
+            SecureRandom r = new SecureRandom();
+            double crossoverProb = r.nextDouble() * 1 + r.nextDouble() * 0.5;
+            if (crossoverProb < crossoverRate || crossoverProb == 1) {
                 String MatchDna1 = String.format("%5s", Integer.toBinaryString(parentOne.getBirthEgg())).replace(' ', '0');
                 String MatchDna2 = String.format("%5s", Integer.toBinaryString(parentTwo.getBirthEgg())).replace(' ', '0');
-                System.out.println("<---------------------------Parent DNA" + "    " + MatchDna1 + MatchDna2 + "------------------------->");
+
                 // Minimum minimum 1 max 4 for crossover point. 5 is out of bound for usefullness 1-4
-                int aRandomValue = r.nextInt(MatchDna1.length()-1) + 1 ;
-                String child1Split1 = MatchDna1.substring(0, aRandomValue);
-                String child1Split2 = MatchDna2.substring(aRandomValue, MatchDna2.length());
-                System.out.println("<---------------------------New DNA of child 1    " + child1Split1 + child1Split2 + "------->");
-                String child2Split1 = MatchDna2.substring(0, aRandomValue);
-                String child2Split2 = MatchDna1.substring(aRandomValue, MatchDna1.length());
-                System.out.println("<---------------------------New DNA of Child 2    " + child2Split1 + child2Split2 + "------->");
-                childOne.setChronosome(child1Split1+child1Split2);
-                childTwo.setChronosome(child2Split1+child2Split2);
+                int aRandomValue =  new SecureRandom().nextInt(MatchDna1.length()-1)+ (int) crossoverProb + 1;
+
+                /*Creating childs*/
+                String child1 = MatchDna1.substring(0, aRandomValue) + MatchDna2.substring(aRandomValue, MatchDna2.length());
+                String child2 = MatchDna2.substring(0, aRandomValue) + MatchDna1.substring(aRandomValue, MatchDna1.length());
+
+                childOne.setChronosome(child1);
+                childTwo.setChronosome(child1);
+                childOne.setFitness(computeFitness(child1));
+                childTwo.setFitness(computeFitness(child2));
+                childOne.setBirthEgg(Integer.parseInt(child1, 2));
+                childTwo.setBirthEgg(Integer.parseInt(child2, 2));
+
                 lastPopulation.add(childOne);
                 lastPopulation.add(childTwo);
             } else {
@@ -129,6 +131,45 @@ public class GeneticAlgorithm {
         return null;
     }
 
+    //Use elitism yes or no
+    public List<Individual> useElitism() {
+            individualsWithFitness.forEach(k -> {
+                if (k.getFitness() > 3) {
+                    lastPopulation.add(k);
+                }
+            });
+            return lastPopulation;
+    }
+
+    //Mutation rate
+    public List<Individual> mutate() {
+
+        return initialPopulation;
+    }
+
+    //Accept new offspring as new population
+    public boolean convergenceCheck() {
+        int f = 0;
+        int f1 = 0;
+        int sizeOfLastPop = lastPopulation.size();
+        int sizeOfInitPop = initialPopulation.size();
+
+        for(Individual individual: lastPopulation) {
+             f+= individual.getFitness();
+        }
+        for(Individual individual : initialPopulation) {
+            f1+= individual.getFitness();
+        }
+
+        double averageInitialPopulation = f1 / sizeOfInitPop;
+        double averageLastPopulation = f / sizeOfLastPop;
+
+        if(averageLastPopulation > averageInitialPopulation) {
+            return true;
+        }
+        return false;
+    }
+
     /*Util methods for different kind of calculations*/
     private static double round(double value, int places) {
         if (places < 0) throw new IllegalArgumentException();
@@ -138,7 +179,6 @@ public class GeneticAlgorithm {
         long tmp = Math.round(value);
         return (double) tmp / factor;
     }
-
     private double getExtractionValue() {
         SecureRandom r = new SecureRandom();
         double extractionValue = round(1 * r.nextDouble(), 1);
@@ -147,7 +187,6 @@ public class GeneticAlgorithm {
         }
         return extractionValue;
     }
-
     private boolean checkInRange(double spinRouletteWheel, double extractionValue) {
         if (spinRouletteWheel < extractionValue) {
             return false;
@@ -161,8 +200,7 @@ public class GeneticAlgorithm {
         }
         return false;
     }
-
-    public double computeFitness(String binary) {
+    private double computeFitness(String binary) {
         /*Max-One*/
         double fitness = 0;
 
@@ -174,7 +212,6 @@ public class GeneticAlgorithm {
         }
         return fitness;
     }
-
     public void clearAllIndividuals() {
         initialPopulation.clear();
         individualsWithFitness.clear();

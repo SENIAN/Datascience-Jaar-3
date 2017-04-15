@@ -15,19 +15,37 @@ public class GeneticStarter extends GeneticAlgorithm {
         setPopSize(initialPopsize);
     }
 
+    public void choiceElitism() {
+        if(isUseElitism()) {
+            clearAllIndividuals();
+            createFirstPopulationSetting();
+            populateToMakeChronosome();
+            getAllFitnesses();
+            selectTwoParents();
+            runOnePointCrossover();
+            mutate();
+            useElitism();
+            convergenceCheck();
+        }else {
+            clearAllIndividuals();
+            createFirstPopulationSetting();
+            populateToMakeChronosome();
+            getAllFitnesses();
+            selectTwoParents();
+            runOnePointCrossover();
+            mutate();
+            convergenceCheck();
+        }
+    }
+
+
     public void startAlgorithm() {
         int iteration = getNumOfIterations();
         while (iteration-- != 0) {
-            if (useElitism) {
-                clearAllIndividuals();
-                System.out.println("<----------------------Iteration Count:[" + iteration  +"]------------------>");
-                System.out.println("<----------------------Creating First Population----------------->");
-                System.out.println("<----------------------Population Size:[" + getPopSize() + "]------------------>");
-                System.out.println("<----------------------Population Size:------------------>");
-                runOnePointCrossover(selectTwoParents(getAllFitnesses(populateToMakeChronosome(createFirstPopulationSetting()))));
-                System.out.println("<----------------------New Childs created:---------------------->");
-
-            }
+            System.out.println("<----------------------Iteration Count:[" + iteration  +"]------------------>");
+            System.out.println("<----------------------Creating First Population----------------->");
+            System.out.println("<----------------------Population Size:[" + getPopSize() + "]------------------>");
+            choiceElitism();
         }
     }
 }
