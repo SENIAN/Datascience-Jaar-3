@@ -2,15 +2,12 @@ import Algorithm.ForeCastingAlgorithm;
 import Algorithm.Model;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.stage.Stage;
-import org.jfree.chart.plot.CategoryPlot;
-import util.Utility;
+import util.GenericFileParser;
 
-import javax.rmi.CORBA.Util;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
@@ -22,14 +19,14 @@ import java.util.List;
 public class Chart extends Application {
 
         URL url = ClassLoader.getSystemResource("SwordForeCasting.csv");
-        Utility utility = new Utility();
+        GenericFileParser genericFileParser = new GenericFileParser();
         List<Model> xyAxis;
         ForeCastingAlgorithm foreCastingAlgorithm = new ForeCastingAlgorithm();
         List<Model> xyAxisSes;
 
         public List<Model> runSesAlgorithm() {
             List<Model> xyAxisSes = new ArrayList<>();
-            xyAxis = utility.readDataFile(new File(url.getFile()));
+            xyAxis = genericFileParser.readDataFile(new File(url.getFile()));
             double initialSes = 0;
             for(int i=0; i < 12; i++) {
                 initialSes += xyAxis.get(i).getY();
@@ -69,7 +66,7 @@ public class Chart extends Application {
 
         @Override
         public void start(Stage stage) {
-            xyAxis = utility.readDataFile(new File(url.getFile()));
+            xyAxis = genericFileParser.readDataFile(new File(url.getFile()));
             xyAxisSes = runSesAlgorithm();
             stage.setTitle("Line Chart");
             //defining the axes

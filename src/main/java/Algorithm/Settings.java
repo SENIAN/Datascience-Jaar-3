@@ -1,5 +1,7 @@
 package Algorithm;
 
+import util.GenericFileParser;
+
 import java.awt.*;
 import java.io.*;
 import java.net.URISyntaxException;
@@ -13,11 +15,33 @@ import java.util.List;
  */
 public class Settings {
 
-    List offerObs;
+    private List<Offer> offerObs;
+    private List<Offer> genericOfferObs;
     Point point;
     File file;
     Offer offer;
+    Model genericSettingModel = new Model();
+    private GenericFileParser genericFileParser = new GenericFileParser();
 
+    public List<Offer> getGenericDataStream() {
+        List<Model> modelList;
+        Offer offer;
+        Point point;
+        genericOfferObs = new ArrayList();
+        URL path = ClassLoader.getSystemResource("");
+        modelList = genericFileParser.readDataFile(new File(path.getFile()));
+        int i =0;
+        for(Model model: modelList) {
+            offer = new Offer();
+            point = new Point();
+            point.setLocation(model.getX(), model.getY());
+            offer.setXylocation(point);
+            offer.setOfferID(i++);
+            genericOfferObs.add(offer);
+        }
+        return genericOfferObs;
+
+    }
 
     public List<Offer> getDataStream() {
 
@@ -44,11 +68,9 @@ public class Settings {
                     }
                 }
             }
-        } catch (IOException e) {
-        } catch (URISyntaxException e) {
+        } catch (IOException | URISyntaxException e) {
+            e.printStackTrace();
         }
-        ;
-
 
         return offerObs;
     }
