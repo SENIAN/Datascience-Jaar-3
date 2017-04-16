@@ -1,5 +1,4 @@
-
-import sun.applet.Main;
+package Algorithm;
 
 import java.awt.*;
 import java.io.*;

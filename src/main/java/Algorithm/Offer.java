@@ -1,3 +1,7 @@
+package Algorithm;
+
+import Algorithm.Centroid;
+
 import java.awt.*;
 
 /**

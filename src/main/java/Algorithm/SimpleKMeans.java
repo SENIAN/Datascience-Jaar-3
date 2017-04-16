@@ -1,3 +1,5 @@
+package Algorithm;
+
 import java.awt.*;
 import java.util.*;
 import java.util.List;
@@ -36,7 +38,7 @@ public class SimpleKMeans {
             centroid.setClusterID(i);
             centroid.setCentroid(p);
             clustersList.add(centroid);
-            System.out.println("Initial Centroid Location:" + " clusterID: " + i + "  " + clustersList.get(i).getCentroid());
+            System.out.println("Initial Algorithm.Centroid Location:" + " clusterID: " + i + "  " + clustersList.get(i).getCentroid());
         }
         return clustersList;
     }
@@ -115,8 +117,8 @@ public class SimpleKMeans {
        }
 
         for (Centroid centroid1 : clustersList) {
-            System.out.println("--------------New Centroid Location-------------");
-            System.out.println("Centroid ID:  " + centroid1.getClusterID());
+            System.out.println("--------------New Algorithm.Centroid Location-------------");
+            System.out.println("Algorithm.Centroid ID:  " + centroid1.getClusterID());
             System.out.println(centroid1.getCentroid().getX() + "   X  " +  "  Y  " + centroid1.getCentroid().getY());
         }
 
