@@ -18,56 +18,16 @@ import java.util.List;
  */
 public class Chart extends Application {
 
-        URL url = ClassLoader.getSystemResource("SwordForeCasting.csv");
-        GenericFileParser genericFileParser = new GenericFileParser();
         List<Model> xyAxis;
-        ForeCastingAlgorithm foreCastingAlgorithm = new ForeCastingAlgorithm();
         List<Model> xyAxisSes;
-
-        public List<Model> runSesAlgorithm() {
-            List<Model> xyAxisSes = new ArrayList<>();
-            xyAxis = genericFileParser.readDataFile(new File(url.getFile()));
-            double initialSes = 0;
-            for(int i=0; i < 12; i++) {
-                initialSes += xyAxis.get(i).getY();
-            }
-            initialSes  = initialSes / 12;
-            foreCastingAlgorithm.setInitialSmoothingFactorSt(initialSes);
-            Model model;
-            for(int j=0; j < xyAxis.size(); j++) {
-                if(j==0) {
-                    model = new Model();
-                    model.setX(xyAxis.get(j).getX());
-                    model.setY(foreCastingAlgorithm.sessFormula(0.73, xyAxis.get(j).getY(), initialSes));
-                    xyAxisSes.add(model);
-                }else{
-                    model = new Model();
-                    model.setX(xyAxis.get(j).getX());
-                    model.setY(foreCastingAlgorithm.sessFormula(0.73, xyAxis.get(j).getY(), initialSes));
-                    xyAxisSes.add(model);
-                }
-            }
-            //region Test Region
-            Model model1 = new Model();
-            model1.setX(37);
-            model1.setY(270);
-            Model model2 = new Model();
-            model2.setX(38);
-            model2.setY(273);
-            Model model3 = new Model();
-            model3.setX(39);
-            model3.setY(274);
-            xyAxisSes.add(model1);
-            xyAxisSes.add(model2);
-            xyAxisSes.add(model3);
-            //endregion
-            return xyAxisSes;
-        }
+        ForeCastingAlgorithm foreCastingAlgorithm = new ForeCastingAlgorithm();
 
         @Override
         public void start(Stage stage) {
-            xyAxis = genericFileParser.readDataFile(new File(url.getFile()));
-            xyAxisSes = runSesAlgorithm();
+            xyAxis = foreCastingAlgorithm.getDemandList();
+            xyAxisSes = foreCastingAlgorithm.runSesAlgorithm(0.659100047);
+
+            foreCastingAlgorithm.runDesAlgorithm();
             stage.setTitle("Line Chart");
             //defining the axes
             final NumberAxis xAxis = new NumberAxis();

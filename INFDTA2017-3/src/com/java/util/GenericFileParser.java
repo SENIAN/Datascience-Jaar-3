@@ -13,7 +13,6 @@ import java.util.List;
  * Created by Mohammed on 4/15/2017.
  */
 public class GenericFileParser {
-
     public List<Model> readDataFile(File file) {
         List<Model> xyAxisList = new ArrayList<>();
         try {
