@@ -6,6 +6,7 @@ import util.GenericFileParser;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -13,6 +14,8 @@ import java.util.List;
  * Created by Mohammed on 3/1/2017.
  */
 public class ForeCastingAlgorithm {
+
+    double sumOfSquaredErrors = 0;
 
     //region instance variables
     double initialSmoothingFactorSt;
@@ -22,6 +25,7 @@ public class ForeCastingAlgorithm {
     double smoothingAlpha;
     double smoothingBeta;
     double standardError;
+
         URL url = ClassLoader.getSystemResource("SwordForeCasting.csv");
     GenericFileParser genericFileParser = new GenericFileParser();
     List<Model> xyAxis;
@@ -46,11 +50,12 @@ public class ForeCastingAlgorithm {
     //endregion
 
     //region Ses and Des algorithm
-    public List<Model> runSesAlgorithm(double pickSmoothingFactor) {
+    public List<Model> runSesAlgorithm(double pickSmoothingFactor, int totalMonthsForcast) {
+        this.smoothingAlpha = pickSmoothingFactor;
         List<Model> xyAxisSes = new ArrayList<>();
         xyAxis = genericFileParser.readDataFile(new File(url.getFile()));
         Model model;
-        Model firstRowModel;
+        Model foreCastModel;
         double foreCast;
         /*Setting the level estimate e.g. St*/
         for (int j = 0; j < xyAxis.size(); j++) {
@@ -83,25 +88,46 @@ public class ForeCastingAlgorithm {
         //endregion
         //region Setting the foreCast error + sum of Squared error
             double forecastError;
+            this.sumOfSquaredErrors = 0;
             for (int i = 0; i < xyAxisSes.size(); i++) {
                 forecastError = xyAxisSes.get(i).getDemandY() - xyAxisSes.get(i).getOneStepForeCastError();
                 xyAxisSes.get(i).setForeCastError(forecastError);
-                xyAxisSes.get(i).setSSE(Math.pow(forecastError, 2));
+                double SquaredErrors = Math.pow(forecastError, 2);
+                xyAxisSes.get(i).setSSE(SquaredErrors);
+                this.sumOfSquaredErrors += SquaredErrors;
             }
         //endregion
-
+        //region forecast coming months region
+        int currentMonth = xyAxisSes.size()-1;
+        for(int i=1; i <= totalMonthsForcast; i++) {
+                foreCastModel = new Model();
+                int nextMonth = currentMonth+i;
+                foreCastModel.setX(nextMonth);
+                System.out.println(xyAxisSes.get(currentMonth).getY());
+                foreCastModel.setY(xyAxisSes.get(currentMonth).getY());
+                xyAxisSes.add(foreCastModel);
+        }
+        //endregion
         return xyAxisSes;
     }
 
-    public List<Model> runDesAlgorithm() {
+    public List<Model> runDesAlgorithm(double pickSmoothingFactor, int totalMonthsForecast) {
+        this.smoothingAlpha = pickSmoothingFactor;
         xyAxis = genericFileParser.readDataFile(new File(url.getFile()));
-        xySesList = runSesAlgorithm(0.659100047);
+        xySesList = runSesAlgorithm(pickSmoothingFactor, 12);
         HashMap<Model, Model> desList = new HashMap<>();
         setInitialBetaFactorBt(xyAxis.get(1).getY() - xyAxis.get(0).getY());
         for (int i = 0; i < xyAxis.size(); i++) {
             desList.put(xyAxis.get(i), xySesList.get(i));
         }
         return new ArrayList<>();
+    }
+    //endregion
+
+    //region Minimize Error function
+    public void standardError() {
+        double st = Math.sqrt(sumOfSquaredErrors / xyAxis.size()-1);
+        this.standardError =  st;
     }
     //endregion
 
@@ -146,6 +172,7 @@ public class ForeCastingAlgorithm {
     }
 
     public double getStandardError() {
+        standardError();
         return standardError;
     }
 
