@@ -1,14 +1,22 @@
 package Chart;
 
-import Algorithm.Centroid;
-import Algorithm.Model;
-import Algorithm.Settings;
-import Algorithm.SimpleKMeans;
+import Algorithm.*;
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.chart.*;
+import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
 
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.EventListener;
 import java.util.List;
 
 /**
@@ -18,24 +26,37 @@ import java.util.List;
 public class Chart extends Application {
 
     Settings settings = new Settings();
+    List<Centroid> centroidList;
+    List<Centroid> pointList;
+
+    SimpleKMeans kMeans = new SimpleKMeans();
 
     public List<Centroid> runKmeans() {
-        SimpleKMeans kMeans = new SimpleKMeans();
-        kMeans.clientObs = settings.getDataStream();
-        int i = 0;
-        kMeans.createClusters(4);
-        kMeans.AssignEachPointToClosestCluster();
-        kMeans.AssignNewCentroidLocation();
-        kMeans.calculateLowestSSE();
+            kMeans.AssignEachPointToClosestCluster();
+            kMeans.AssignNewCentroidLocation();
+            kMeans.calculateLowestSSE();
+
         return kMeans.clustersList;
     }
+
+    public List runParameters(int iterations, int clustersSize) {
+        kMeans.clientObs = settings.getDataStream();
+        kMeans.createClusters(clustersSize);
+        if(iterations==0) {
+            centroidList = runKmeans();
+        }
+            while (iterations-- != 0) {
+                centroidList.clear();
+                centroidList.addAll(runKmeans());
+            }
+            return centroidList;
+        }
 
 
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        List<Centroid> centroidList = runKmeans();
-
+        pointList = runParameters(0, 4);
         primaryStage.setTitle("Scatter Chart");
         //defining the axes
         final NumberAxis xAxis = new NumberAxis();
@@ -45,7 +66,7 @@ public class Chart extends Application {
         yAxis.setLabel("Total Wine Offers");
         //creating the chart
         final ScatterChart<Number,Number> scatterChart =
-                new ScatterChart<Number, Number>(xAxis,yAxis);
+                new ScatterChart<>(xAxis,yAxis);
 
         scatterChart.setTitle("K-Means Clustering");
         //defining a series
@@ -54,19 +75,46 @@ public class Chart extends Application {
         points.setName("Wine Offers");
         clusters.setName("Clusters");
 
-        //populating the series with data
-        centroidList.forEach(k-> {
+
+        VBox vBoxChart = new VBox();
+        VBox vBox = new VBox();
+        Button button = new Button("Run K Means");
+        TextField iterations = new TextField();
+        iterations.setPromptText("Amount of Iterations");
+        TextField countOfClusters = new TextField();
+        countOfClusters.setPromptText("Cluster Size");
+        Label label  = new Label("Sum of Squared Errors");
+        vBox.getChildren().addAll(iterations, countOfClusters, label,button);
+
+        button.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                clusters.getData().clear();
+                List<Centroid> centroidList = runParameters(Integer.parseInt(iterations.getText()), Integer.parseInt(countOfClusters.getText()));
+                for(Centroid centroid : centroidList) {
+                    clusters.getData().add(new XYChart.Data(centroid.getCentroid().getX(), centroid.getCentroid().getY()));
+                }
+                centroidList.clear();
+           }
+        });
+
+        pointList.forEach(k-> {
             k.getOfferList().forEach(v-> {
                 points.getData().add(new XYChart.Data(v.getXylocation().getX(), v.getXylocation().getY()));
+                {
+                }
             });
         });
 
-        centroidList.forEach(k-> {
-                clusters.getData().add(new XYChart.Data(k.getCentroid().getX(), k.getCentroid().getY()));
-        });
 
-        Scene scene  = new Scene(scatterChart,800,600);
+
         scatterChart.getData().addAll(points,clusters);
+        vBoxChart.getChildren().addAll(scatterChart, vBox);
+        //populating the series with data
+
+
+
+        Scene scene  = new Scene(vBoxChart,800,600);
 
 
         primaryStage.setScene(scene);

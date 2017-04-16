@@ -103,7 +103,6 @@ public class ForeCastingAlgorithm {
                 foreCastModel = new Model();
                 int nextMonth = currentMonth+i;
                 foreCastModel.setX(nextMonth);
-                System.out.println(xyAxisSes.get(currentMonth).getY());
                 foreCastModel.setY(xyAxisSes.get(currentMonth).getY());
                 xyAxisSes.add(foreCastModel);
         }
