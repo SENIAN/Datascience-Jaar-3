@@ -25,7 +25,6 @@ public class GeneticStarter extends GeneticAlgorithm {
             runOnePointCrossover();
             mutate();
             useElitism();
-            convergenceCheck();
         }else {
             clearAllIndividuals();
             createFirstPopulationSetting();
@@ -34,7 +33,6 @@ public class GeneticStarter extends GeneticAlgorithm {
             selectTwoParents();
             runOnePointCrossover();
             mutate();
-            convergenceCheck();
         }
     }
 
@@ -42,11 +40,15 @@ public class GeneticStarter extends GeneticAlgorithm {
     public void startAlgorithm() {
         int iteration = getNumOfIterations();
         int i = 0;
-        while (i++ != iteration) {
-            System.out.println("<----------------------Iteration Count:[" + i  +"]------------------>");
-            System.out.println("<----------------------Creating First Population----------------->");
-            System.out.println("<----------------------Population Size:[" + getPopSize() + "]------------------>");
-            choiceElitism();
-        }
+              while (i++ < iteration) {
+                  choiceElitism();
+                  if (i == iteration) {
+                      System.out.println("<----------------------Iteration Count:[" + i + "]------------------>");
+                      System.out.println("<----------------------Creating First Population----------------->");
+                      System.out.println("<----------------------Population Size:[" + getPopSize() + "]------------------>");
+                      System.out.println("<---------------------Best Individual this Iteration--------------->");
+                      convergenceCheck();
+                  }
+              }
     }
 }

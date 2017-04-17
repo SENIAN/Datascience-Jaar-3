@@ -17,13 +17,11 @@ public class GeneticAlgorithm {
     private int numOfIterations;
     private int popSize;
     private int childId = 0;
-    private int averageFitnessOfInitialPopulation;
-    private int fitnessOfNewPopulation;
-    private List<Individual> initialPopulation = new ArrayList<>();
+    public List<Individual> initialPopulation = new ArrayList<>();
     private List<Individual> listWithChronosomes = new ArrayList<>();
     private List<Individual> individualsWithFitness = new ArrayList<>();
     private List<Individual> twoParents = new ArrayList<>();
-    private List<Individual> lastPopulation = new ArrayList<>();
+    public List<Individual> lastPopulation = new ArrayList<>();
 
 
     /*Initial Population creation  + initialization of chronosomes */
@@ -60,7 +58,6 @@ public class GeneticAlgorithm {
         }
         return individualsWithFitness;
     }
-
     // Selects 2 parents based on Russian Roulette SelectionModel
     public List<Individual> selectTwoParents() {
         double totalFitness = 0.0;
@@ -90,7 +87,6 @@ public class GeneticAlgorithm {
         }
         return twoParents;
     }
-
     //Crossover rate from parents to individual
     public void runOnePointCrossover() {
         Individual parentOne;
@@ -102,7 +98,7 @@ public class GeneticAlgorithm {
             parentOne = twoParents.get(0);
             parentTwo = twoParents.get(1);
             SecureRandom r = new SecureRandom();
-            double crossoverProb = r.nextDouble() * 1 + r.nextDouble() * 0.5;
+            double crossoverProb = r.nextDouble() * 1;
             if (crossoverProb < crossoverRate || crossoverProb == 1) {
                 String MatchDna1 = String.format("%5s", Integer.toBinaryString(parentOne.getBirthEgg())).replace(' ', '0');
                 String MatchDna2 = String.format("%5s", Integer.toBinaryString(parentTwo.getBirthEgg())).replace(' ', '0');
@@ -137,7 +133,6 @@ public class GeneticAlgorithm {
             System.out.println("Please provide algorithm with 2 parents to do the crossover");
         }
     }
-
     //Use elitism yes or no
     public List<Individual> useElitism() {
             individualsWithFitness.forEach(k -> {
@@ -147,7 +142,6 @@ public class GeneticAlgorithm {
             });
             return lastPopulation;
     }
-
     //Mutation rate
     public List<Individual> mutate() {
 
@@ -160,11 +154,11 @@ public class GeneticAlgorithm {
         int f1 = 0;
         int sizeOfLastPop = lastPopulation.size();
         int sizeOfInitPop = initialPopulation.size();
-        double fitnessMax = Double.MAX_VALUE;
         double fitnessMin = 0;
         Individual bestIndividual = new Individual();
         for(Individual individual: lastPopulation) {
              f+= individual.getFitness();
+
              if(individual.getFitness() > fitnessMin) {
                  fitnessMin = individual.getFitness();
                  bestIndividual = individual;
@@ -181,7 +175,8 @@ public class GeneticAlgorithm {
         double averageLastPopulation = f / sizeOfLastPop;
         System.out.println("Average Fitness Of Initial Population:  "  + averageInitialPopulation);
         System.out.println("Average Fitness Of Last Population:  " + averageLastPopulation);
-        if(averageLastPopulation > averageInitialPopulation) {
+
+         if(averageLastPopulation > averageInitialPopulation) {
             return true;
         }
         return false;
@@ -257,43 +252,33 @@ public class GeneticAlgorithm {
     public double getCrossoverRate() {
         return crossoverRate;
     }
-
     public double getMutationRate() {
         return mutationRate;
     }
-
     public int getNumOfIterations() {
         return numOfIterations;
     }
-
     public int getPopSize() {
         return popSize;
     }
-
     public boolean isUseElitism() {
         return useElitism;
     }
-
     public void setCrossoverRate(double crossoverRate) {
         this.crossoverRate = crossoverRate;
     }
-
     public void setInitialPopulation(List<Individual> initialPopulation) {
         this.initialPopulation = initialPopulation;
     }
-
     public void setMutationRate(double mutationRate) {
         this.mutationRate = mutationRate;
     }
-
     public void setNumOfIterations(int numOfIterations) {
         this.numOfIterations = numOfIterations;
     }
-
     public void setPopSize(int popSize) {
         this.popSize = popSize;
     }
-
     public void setUseElitism(boolean useElitism) {
         this.useElitism = useElitism;
     }
