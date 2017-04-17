@@ -77,7 +77,6 @@ public class GeneticAlgorithm {
             double spinRouletteWheel = 0.0;
             for (Individual individual : individualsWithFitness) {
                 spinRouletteWheel += individual.getChangeToBePicked();
-                i++;
                 if (checkInRange(spinRouletteWheel, extractionValue)) {
                     if (twoParents.size() <= 1) {
                         twoParents.add(individual);
@@ -133,21 +132,39 @@ public class GeneticAlgorithm {
             System.out.println("Please provide algorithm with 2 parents to do the crossover");
         }
     }
+    //Mutate based on mutationRate
+    public List<Individual> mutation() {
+        Random r = new Random();
+        double test = r.nextDouble() * 0.1;
+        for (Individual individual : lastPopulation) {
+            if (mutationRate > r.nextDouble() * 0.1) {
+                String ChronosomeValue = individual.getChronosome();
+                int mutationFactor = new Random().nextInt(ChronosomeValue.length());
+                char mutationReference = ChronosomeValue.charAt(mutationFactor);
+                char mutationArray[];
+                if (mutationReference == '0') {
+                    mutationArray = ChronosomeValue.toCharArray();
+                    mutationArray[mutationFactor] = '1';
+                    individual.setChronosome(String.valueOf(mutationArray));
+                }
+                if(mutationReference == '1') {
+                    mutationArray = ChronosomeValue.toCharArray();
+                    mutationArray[mutationFactor] = '0';
+                    individual.setChronosome(String.valueOf(mutationArray));
+                }
+            }
+        }
+        return lastPopulation;
+    }
     //Use elitism yes or no
     public List<Individual> useElitism() {
             individualsWithFitness.forEach(k -> {
-                if (k.getFitness() > 3) {
+                if (k.getFitness() >= 3) {
                     lastPopulation.add(k);
                 }
             });
             return lastPopulation;
     }
-    //Mutation rate
-    public List<Individual> mutate() {
-
-        return initialPopulation;
-    }
-
     //Accept new offspring as new population
     public boolean convergenceCheck() {
         int f = 0;
@@ -179,8 +196,12 @@ public class GeneticAlgorithm {
          if(averageLastPopulation > averageInitialPopulation) {
             return true;
         }
+        lastPopulation.clear();
+
         return false;
     }
+
+
 
     /*Util methods for different kind of calculations*/
     private static double round(double value, int places) {
@@ -231,23 +252,6 @@ public class GeneticAlgorithm {
         twoParents.clear();
     }
 
-/*
-    public Individual<Integer> mutation(Individual<Integer> mutate) {
-        String ChronosomeValue = String.format("%5s", Integer.toBinaryString(mutate.getIndividual())).replace(' ', '0');
-        int mutationFactor = new Random().nextInt(ChronosomeValue.length());
-        char mutationReference = ChronosomeValue.charAt(mutationFactor);
-        char mutationArray[];
-        if (mutationReference == '0') {
-            mutationArray = ChronosomeValue.toCharArray();
-            mutationArray[mutationFactor] = '1';
-            return new Individual<Integer>(Integer.parseInt(String.valueOf(mutationArray), 2));
-        }
-        mutationArray = ChronosomeValue.toCharArray();
-        mutationArray[mutationFactor] = '0';
-        return new Individual<Integer>(Integer.parseInt(String.valueOf(mutationArray), 2));
-
-    }*/
-
 
     public double getCrossoverRate() {
         return crossoverRate;
@@ -283,21 +287,3 @@ public class GeneticAlgorithm {
         this.useElitism = useElitism;
     }
 }
-
-/*
-ALGORITHM – MAIN LOOP
-The main loop of the genetic algorithm is explained in the slides of the course.
-Moreover, a C# sample containing only the main loop of a generic genetic algorithm is available and can be used as a
-starting point. If you use this code, you will have to program by yourself some specific functions to make it work. The
-functions are:
- Func<Ind> createIndividual ==> input is nothing, output is a new individual;
- Func<Ind,double> computeFitness ==> input is one individual, output is its fitness;
- Func<Ind[],double[],Func<Tuple<Ind,Ind>>> selectTwoParents ==> input is an array of individuals (population)
-and an array of corresponding fitnesses, output is a function which (without any input) returns a tuple with two
-individuals (parents);
- Func<Tuple<Ind, Ind>, Tuple<Ind, Ind>> crossover ==> input is a tuple with two individuals (parents), output is a
-tuple with two individuals (offspring/children);
- Func<Ind, double, Ind> mutation ==> input is one individual and mutation rate, output is the mutated individual
-where Ind is the data structure which encodes the individual. You need to define concretely this data structure by
-yourself
- */

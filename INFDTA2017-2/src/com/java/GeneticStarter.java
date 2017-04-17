@@ -23,7 +23,7 @@ public class GeneticStarter extends GeneticAlgorithm {
             getAllFitnesses();
             selectTwoParents();
             runOnePointCrossover();
-            mutate();
+            mutation();
             useElitism();
         }else {
             clearAllIndividuals();
@@ -32,7 +32,7 @@ public class GeneticStarter extends GeneticAlgorithm {
             getAllFitnesses();
             selectTwoParents();
             runOnePointCrossover();
-            mutate();
+            mutation();
         }
     }
 
