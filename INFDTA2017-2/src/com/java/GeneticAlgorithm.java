@@ -160,17 +160,27 @@ public class GeneticAlgorithm {
         int f1 = 0;
         int sizeOfLastPop = lastPopulation.size();
         int sizeOfInitPop = initialPopulation.size();
-
+        double fitnessMax = Double.MAX_VALUE;
+        double fitnessMin = 0;
+        Individual bestIndividual = new Individual();
         for(Individual individual: lastPopulation) {
              f+= individual.getFitness();
+             if(individual.getFitness() > fitnessMin) {
+                 fitnessMin = individual.getFitness();
+                 bestIndividual = individual;
+             }
         }
+        System.out.println("Best Individual in the population:  " + " Fitness: " + bestIndividual.getFitness() +
+                " Individual ID:  " + bestIndividual.getIndividualID());
+
         for(Individual individual : initialPopulation) {
             f1+= individual.getFitness();
         }
 
         double averageInitialPopulation = f1 / sizeOfInitPop;
         double averageLastPopulation = f / sizeOfLastPop;
-
+        System.out.println("Average Fitness Of Initial Population:  "  + averageInitialPopulation);
+        System.out.println("Average Fitness Of Last Population:  " + averageLastPopulation);
         if(averageLastPopulation > averageInitialPopulation) {
             return true;
         }

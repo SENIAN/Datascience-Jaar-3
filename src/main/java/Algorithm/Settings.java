@@ -15,6 +15,10 @@ import java.util.List;
  */
 public class Settings {
 
+
+
+
+
     private List<Offer> offerObs;
     private List<Offer> genericOfferObs;
     Point point;

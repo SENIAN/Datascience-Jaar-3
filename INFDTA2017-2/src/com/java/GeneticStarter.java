@@ -41,8 +41,9 @@ public class GeneticStarter extends GeneticAlgorithm {
 
     public void startAlgorithm() {
         int iteration = getNumOfIterations();
-        while (iteration-- != 0) {
-            System.out.println("<----------------------Iteration Count:[" + iteration  +"]------------------>");
+        int i = 0;
+        while (i++ != iteration) {
+            System.out.println("<----------------------Iteration Count:[" + i  +"]------------------>");
             System.out.println("<----------------------Creating First Population----------------->");
             System.out.println("<----------------------Population Size:[" + getPopSize() + "]------------------>");
             choiceElitism();
