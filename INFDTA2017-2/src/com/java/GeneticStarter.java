@@ -36,7 +36,6 @@ public class GeneticStarter extends GeneticAlgorithm {
         }
     }
 
-
     public void startAlgorithm() {
         int iteration = getNumOfIterations();
         int i = 0;
@@ -47,8 +46,8 @@ public class GeneticStarter extends GeneticAlgorithm {
                       System.out.println("<----------------------Creating First Population----------------->");
                       System.out.println("<----------------------Population Size:[" + getPopSize() + "]------------------>");
                       System.out.println("<---------------------Best Individual this Iteration--------------->");
-                      convergenceCheck();
-                  }
+                   convergenceCheck();
               }
+         }
     }
 }

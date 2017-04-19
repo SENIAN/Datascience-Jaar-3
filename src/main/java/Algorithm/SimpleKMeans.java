@@ -117,8 +117,6 @@ public class SimpleKMeans {
        }
 
         for (Centroid centroid1 : clustersList) {
-            System.out.println("--------------New Algorithm.Centroid Location-------------");
-            System.out.println("Algorithm.Centroid ID:  " + centroid1.getClusterID());
             System.out.println(centroid1.getCentroid().getX() + "   X  " +  "  Y  " + centroid1.getCentroid().getY());
         }
 

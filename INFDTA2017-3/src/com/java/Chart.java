@@ -28,10 +28,14 @@ public class Chart extends Application {
 
         List<Model> xyAxis;
         List<Model> xyAxisSes;
+        List<Model> xyAxisDes;
         ForeCastingAlgorithm foreCastingAlgorithm = new ForeCastingAlgorithm();
 
         public List<Model> controlHandler(double smoothingFactor, int totalMonthsForecast) {
            return foreCastingAlgorithm.runSesAlgorithm(smoothingFactor, totalMonthsForecast);
+        }
+        public List<Model> controlHandlerDes(double smoothingA, int totalMonths, double smoothingB) {
+            return foreCastingAlgorithm.runDesAlgorithm(smoothingA, totalMonths, smoothingB);
         }
 
         @Override
@@ -39,7 +43,7 @@ public class Chart extends Application {
             xyAxis = foreCastingAlgorithm.getDemandList();
             xyAxisSes = foreCastingAlgorithm.runSesAlgorithm(0.659100047,12);
 
-            foreCastingAlgorithm.runDesAlgorithm(0.659100047, 12);
+            xyAxisDes = foreCastingAlgorithm.runDesAlgorithm(0.73, 12, 0.001);
             stage.setTitle("Line Chart");
             //defining the axes
             final NumberAxis xAxis = new NumberAxis();
@@ -60,7 +64,8 @@ public class Chart extends Application {
 
             demand.setName("Swords Demand");
             forecastSes.setName("ForeCasting SES");
-            forecastDes.setName("ForeCasting Des");
+            forecastDes.setName("ForeCasting DES");
+
             //populating the series with data
             for(Model model : xyAxis) {
                 demand.getData().add(new XYChart.Data(model.getX(), model.getY()));
@@ -68,7 +73,9 @@ public class Chart extends Application {
             for(Model model : xyAxisSes) {
                 forecastSes.getData().add(new XYChart.Data(model.getX(), model.getY()));
             }
-
+            for(Model model : xyAxisDes) {
+                forecastDes.getData().add(new XYChart.Data(model.getX(), model.getY()));
+            }
             VBox vBox = new VBox();
             VBox vbox1 = new VBox();
 
@@ -76,11 +83,18 @@ public class Chart extends Application {
             vBox.setSpacing(8);
             Text StandardError = new Text( " Standard Error " + foreCastingAlgorithm.getStandardError() + "");
             Text AlphaFactor = new Text(" Alpha Value " + foreCastingAlgorithm.getSmoothingAlpha() + "");
+            Text BetaFactor = new Text("Gamma value " + foreCastingAlgorithm.getSmoothingBeta() + "");
             TextField smoothingInput = new TextField();
-            smoothingInput.setPromptText("Fill in the Alpha Value desired");
-            smoothingInput.setMaxWidth(200);
+            TextField betaInput = new TextField();
+            TextField betaSmoothingInput = new TextField();
+            smoothingInput.setPromptText("Fill in the Alpha Value desired for the SES");
+            smoothingInput.setMaxWidth(300);
+            betaSmoothingInput.setPromptText("Fill the Alpha value desired for the DES");
+            betaSmoothingInput.setMaxWidth(300);
+            betaInput.setPromptText("Fill in the gamma value desired");
+            betaInput.setMaxWidth(300);
             TextField foreCastingMonths = new TextField();
-            foreCastingMonths.setMaxWidth(200);
+            foreCastingMonths.setMaxWidth(300);
             foreCastingMonths.setPromptText("Total Months u want to forecast");
             Button button = new Button("(Re)-Run Algorithm");
 
@@ -89,16 +103,28 @@ public class Chart extends Application {
                 public void handle(MouseEvent event) {
                     vbox1.getChildren().clear();
                     forecastSes.getData().clear();
-                    xyAxisSes = controlHandler(Double.parseDouble(smoothingInput.getText()), Integer.parseInt(foreCastingMonths.getText()));
-                    for(Model model : xyAxisSes) {
-                        forecastSes.getData().add(new XYChart.Data(model.getX(), model.getY()));
+                    forecastDes.getData().clear();
+                    if(!smoothingInput.getText().isEmpty()) {
+                        xyAxisSes = controlHandler(Double.parseDouble(smoothingInput.getText()), Integer.parseInt(foreCastingMonths.getText()));
+                        for (Model model : xyAxisSes) {
+                            forecastSes.getData().add(new XYChart.Data(model.getX(), model.getY()));
+                        }
+                    }
+                    if(!betaSmoothingInput.getText().isEmpty()) {
+                        xyAxisDes = controlHandlerDes(Double.parseDouble(betaSmoothingInput.getText()), Integer.parseInt(foreCastingMonths.getText()), Double.parseDouble(betaInput.getText()));
+
+                        for (Model model : xyAxisDes) {
+                            forecastDes.getData().add(new XYChart.Data(model.getX(), model.getY()));
+                        }
+                        Text BetaFactor = new Text("Gamma value" +  foreCastingAlgorithm.getSmoothingBeta() + "");
+                        vbox1.getChildren().add(BetaFactor);
                     }
                     Text StandardError = new Text( " Standard Error " + foreCastingAlgorithm.getStandardError() + "");
                     Text AlphaFactor = new Text(" Alpha Value " + foreCastingAlgorithm.getSmoothingAlpha() + "");
                     vbox1.getChildren().addAll(StandardError,AlphaFactor);
                 }
             });
-            vBox.getChildren().addAll(StandardError, AlphaFactor, smoothingInput, button, foreCastingMonths,vbox1);
+            vBox.getChildren().addAll(StandardError, AlphaFactor, smoothingInput, BetaFactor, betaSmoothingInput, foreCastingMonths, betaInput, button, vbox1);
             vBox.getChildren().add(lineChart);
             Scene scene  = new Scene(vBox,800,600);
             lineChart.getData().addAll(demand, forecastSes,forecastDes);

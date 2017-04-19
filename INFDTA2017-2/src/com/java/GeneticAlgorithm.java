@@ -38,7 +38,7 @@ public class GeneticAlgorithm {
         }
         return initialPopulation;
     }
-    /*Chronosomes set*/
+    /* Chronosomes set */
     public List<Individual> populateToMakeChronosome() {
         initialPopulation.forEach(n -> {
             String ChronosomeValue = String.format("%5s", Integer.toBinaryString(n.getBirthEgg())).replace(' ', '0');
@@ -159,7 +159,7 @@ public class GeneticAlgorithm {
     //Use elitism yes or no
     public List<Individual> useElitism() {
             individualsWithFitness.forEach(k -> {
-                if (k.getFitness() >= 3) {
+                if (k.getFitness() > 3) {
                     lastPopulation.add(k);
                 }
             });
@@ -175,7 +175,6 @@ public class GeneticAlgorithm {
         Individual bestIndividual = new Individual();
         for(Individual individual: lastPopulation) {
              f+= individual.getFitness();
-
              if(individual.getFitness() > fitnessMin) {
                  fitnessMin = individual.getFitness();
                  bestIndividual = individual;
@@ -183,21 +182,16 @@ public class GeneticAlgorithm {
         }
         System.out.println("Best Individual in the population:  " + " Fitness: " + bestIndividual.getFitness() +
                 " Individual ID:  " + bestIndividual.getIndividualID());
-
         for(Individual individual : initialPopulation) {
             f1+= individual.getFitness();
         }
-
         double averageInitialPopulation = f1 / sizeOfInitPop;
         double averageLastPopulation = f / sizeOfLastPop;
         System.out.println("Average Fitness Of Initial Population:  "  + averageInitialPopulation);
         System.out.println("Average Fitness Of Last Population:  " + averageLastPopulation);
-
-         if(averageLastPopulation > averageInitialPopulation) {
+        if(averageLastPopulation > averageInitialPopulation) {
             return true;
         }
-        lastPopulation.clear();
-
         return false;
     }
 
@@ -251,8 +245,6 @@ public class GeneticAlgorithm {
         listWithChronosomes.clear();
         twoParents.clear();
     }
-
-
     public double getCrossoverRate() {
         return crossoverRate;
     }

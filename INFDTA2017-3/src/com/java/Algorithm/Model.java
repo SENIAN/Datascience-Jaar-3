@@ -9,12 +9,20 @@ public class Model {
     double X; // X Axis
     double Y; // Y Axis
     double DemandY; // Demand Axis
-    double desYSt; // Updated equation for des
+    double desYSt; // Updated equation for des Smooth
+    double desYBt; // updated equation for des Trend
     double OSFE; // One Step forcast error
     double FE; // ForeCast error
     double SSE; // Sum of Squared Errors
     //endregion
     //region getters and setters
+
+    public double getDesYBt() {
+        return desYBt;
+    }
+    public void setDesYBt(double desYBt) {
+        this.desYBt = desYBt;
+    }
     public double getDesYSt() {
         return desYSt;
     }
