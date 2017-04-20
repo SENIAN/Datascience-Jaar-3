@@ -159,7 +159,7 @@ public class GeneticAlgorithm {
     //Use elitism yes or no
     public List<Individual> useElitism() {
             individualsWithFitness.forEach(k -> {
-                if (k.getFitness() > 3) {
+                if (k.getFitness() > 4) {
                     lastPopulation.add(k);
                 }
             });
@@ -198,6 +198,11 @@ public class GeneticAlgorithm {
 
 
     /*Util methods for different kind of calculations*/
+    private double computeFitness(String binary) {
+        double fitness = Integer.parseInt(binary, 2);
+        return ((Math.pow(fitness,2)*(-1)) + (7*fitness));
+    }
+
     private static double round(double value, int places) {
         if (places < 0) throw new IllegalArgumentException();
 
@@ -227,19 +232,8 @@ public class GeneticAlgorithm {
         }
         return false;
     }
-    private double computeFitness(String binary) {
-        /*Max-One*/
-        double fitness = 0;
 
-        for (int i = 0; i < binary.length(); i++) {
-            char s = binary.charAt(i);
-            if (s == '1') {
-                fitness++;
-            }
-        }
-        return fitness;
-    }
-    public void clearAllIndividuals() {
+    public void clearUnusedLists() {
         initialPopulation.clear();
         individualsWithFitness.clear();
         listWithChronosomes.clear();

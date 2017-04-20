@@ -17,7 +17,7 @@ public class GeneticStarter extends GeneticAlgorithm {
 
     public void choiceElitism() {
         if(isUseElitism()) {
-            clearAllIndividuals();
+            clearUnusedLists();
             createFirstPopulationSetting();
             populateToMakeChronosome();
             getAllFitnesses();
@@ -26,7 +26,7 @@ public class GeneticStarter extends GeneticAlgorithm {
             mutation();
             useElitism();
         }else {
-            clearAllIndividuals();
+            clearUnusedLists();
             createFirstPopulationSetting();
             populateToMakeChronosome();
             getAllFitnesses();
